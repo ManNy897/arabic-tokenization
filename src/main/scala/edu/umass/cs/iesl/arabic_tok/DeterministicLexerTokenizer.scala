@@ -45,15 +45,16 @@ class DeterministicLexerTokenizer(
     for (section <- document.sections) {
       /* Add this newline to avoid JFlex issue where we can't match EOF with lookahead */
       val reader = new StringReader(section.string + "\n")
-      val lexer =
+      val lexer = new ArabicLexer(reader, tokenizeSgml, tokenizeNewline, tokenizeWhitespace)
+    //  val lexer =
         // here we make sure that if normalize = false, we really don't normalize anything
-        if(normalize)
-          new EnglishLexer(reader, tokenizeSgml, tokenizeNewline, tokenizeWhitespace, tokenizeAllDashedWords, abbrevPrecedesLowercase,
-          normalizeQuote, normalizeApostrophe, normalizeCurrency, normalizeAmpersand, normalizeFractions, normalizeEllipsis,
-          undoPennParens, unescapeSlash, unescapeAsterisk, normalizeMDash, normalizeDash, normalizeHtmlSymbol, normalizeHtmlAccent)
-        else
-          new EnglishLexer(reader, tokenizeSgml, tokenizeNewline, tokenizeWhitespace, tokenizeAllDashedWords, abbrevPrecedesLowercase,
-            false, false, false, false, false, false, false, false, false, false, false, false, false)
+    //    if(normalize)
+    //      new EnglishLexer(reader, tokenizeSgml, tokenizeNewline, tokenizeWhitespace, tokenizeAllDashedWords, abbrevPrecedesLowercase,
+    //      normalizeQuote, normalizeApostrophe, normalizeCurrency, normalizeAmpersand, normalizeFractions, normalizeEllipsis,
+    //      undoPennParens, unescapeSlash, unescapeAsterisk, normalizeMDash, normalizeDash, normalizeHtmlSymbol, normalizeHtmlAccent)
+    //    else
+    //      new EnglishLexer(reader, tokenizeSgml, tokenizeNewline, tokenizeWhitespace, tokenizeAllDashedWords, abbrevPrecedesLowercase,
+    //        false, false, false, false, false, false, false, false, false, false, false, false, false)
 
       var currentToken = lexer.yylex().asInstanceOf[(String, Int, Int)]
       while (currentToken != null){
@@ -153,7 +154,8 @@ object DeterministicNormalizingTokenizer extends DeterministicLexerTokenizer(
 ){
   /* For testing purposes: Tokenizes and normalizes input from stdin using DeterministicNormalizingTokenizer */
   def main(args: Array[String]): Unit = {
-    val string = io.Source.fromInputStream(System.in).mkString
+//    val string = io.Source.fromInputStream(System.in).mkString
+    val string = "قال فرانس كلينتسيفتش النائب الأول لرئيس لجنة الدفاع والأمن في مجلس الاتحاد الروسي إن  القاهرة غير مستعدة لضمان سلامة سياح روسيا، واستبعد استعادة الروابط الجوية بين الجانبين."
 //    println("Tokenizing...")
     val doc = new Document(string)
     val t0 = System.currentTimeMillis()
